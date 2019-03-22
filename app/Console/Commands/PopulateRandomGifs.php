@@ -26,7 +26,7 @@ class PopulateRandomGifs extends Command
         $this->validator = $validator;
     }
 
-    public function handle(): void
+    public function handle(): int
     {
         $validator = $this->validator->make($this->arguments(), [
             'total' => ['integer'],
@@ -37,13 +37,13 @@ class PopulateRandomGifs extends Command
             $this->error('Unable to comply:');
             foreach ($validator->errors()->all() as $error) {
                 $this->error($error);
+                return 1;
             }
         }
 
 
         for ($i = 1; $i <= $this->argument('total'); $i++) {
             $this->info('Fetching image ' . $i . ' of ' . $this->argument('total'));
-
             try {
                 $gif = $this->giphy->random()->getData();
             } catch (Exception $exception) {
@@ -52,11 +52,10 @@ class PopulateRandomGifs extends Command
 
                 if ($this->failures >= 5) {
                     $this->error('Too many GIPHY errors... Giving up');
-                    return;
+                    return 1;
                 }
 
                 $this->warn('GIPHY error... backing off for ' . $this->backoff . ' seconds.');
-
                 sleep($this->backoff);
                 continue;
             }
@@ -72,5 +71,6 @@ class PopulateRandomGifs extends Command
             sleep($this->argument('sleep'));
         }
 
+        return 0;
     }
 }
