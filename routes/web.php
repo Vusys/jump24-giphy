@@ -11,6 +11,12 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\RandomController;
+
+Route::get('/', [HomeController::class, 'index'])->name('index');
+Route::post('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/search/{search}', [SearchController::class, 'searchResults'])->name('search.results');
+
+Route::get('/random', [RandomController::class, 'index'])->name('random.index');
